@@ -1,0 +1,12 @@
+.App{
+  height: 100%;
+}
+
+main {
+  padding: 100px 15px 15px 15px;
+  display: flex;
+  flex-direction: column;
+  max-width: 1000px;
+  margin: 0 auto;
+  height: 100%;
+}
