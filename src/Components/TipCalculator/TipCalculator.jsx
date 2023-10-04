@@ -1,15 +1,41 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import "./TipCalculator.css"
 
 const TipCalculator = () => {
   const [billDollarsInput, setBillDollarsInput] = useState("$0");
   const [tipPercentInput, setTipPercentInput] = useState("15%");
   const [numberOfPeopleInput, setNumberOfPeopleInput] = useState("1");
-  const [tipDollars, setTipDollars] = useState(0)
-  const [billTotal, setBillTotal] = useState(0)
-  const [isValidBill, setIsValidBill] = useState(true)
-  const [isValidTip, setIsValidTip] = useState(true)
-  const [isValidNumberOfPeople, setIsValidNumberOfPeople] = useState(true)
+  const [tipDollars, setTipDollars] = useState(0);
+  const [billTotal, setBillTotal] = useState(0);
+  const [isValidBill, setIsValidBill] = useState(true);
+  const [isValidTip, setIsValidTip] = useState(true);
+  const [isValidNumberOfPeople, setIsValidNumberOfPeople] = useState(true);
+
+  const calculateTip = useCallback(
+    (e) => {
+    e?.preventDefault()
+
+    if (!isValidBill || !isValidNumberOfPeople || !isValidTip ) return;
+
+    const parseBill = parseFloat(billDollarsInput.replace("$", ""))
+    const parseTip = parseFloat(tipPercentInput.replace("%", ""))
+    const parseNumberOfPeople = parseInt(numberOfPeopleInput)
+
+    if (e){
+        setTipPercentInput(tipPercentInput.replace("%", "") + "%")
+        setBillDollarsInput("$" + billDollarsInput.replace("$", ""))
+    }
+    setTipDollars((parseBill * (parseTip)/100) / parseNumberOfPeople)
+    setBillTotal((parseBill + parseBill * (parseTip / 100)) / parseNumberOfPeople)
+  },
+  (
+    numberOfPeopleInput,
+    tipPercentInput,
+    billDollarsInput,
+    isValidTip,
+    isValidNumberOfPeople,
+    isValidBill
+  ))
   
     function isValidInput(numStr, unitType) {
         if (unitType === 'dollars' && numStr.match(/^\$.+/)) numStr = numStr.replace("$", "")
@@ -67,9 +93,12 @@ const TipCalculator = () => {
         setTipPercentInput(newInput)
     }
 
+    useEffect(() => {
+        calculateTip()
+    }, (calculateTip))
 
   return (
-    <form className = "tip-calculator" onSubmit={() => null}>
+    <form className = "tip-calculator" onSubmit={calculateTip}>
       <div className = "section">
         <div className = "form-group">
           <label>Bill</label>
